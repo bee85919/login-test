@@ -40,7 +40,7 @@ def login():
         email = request.form['email']
         # 세션을 생성하고 이메일을 전송
         session_manager.create_session(email, session)
-        return session_manager.get_email_redirect(email)
+        return session_manager.get_email_redirect()
     return render_template('login.html')
 
 # 로그인 확인 라우트
