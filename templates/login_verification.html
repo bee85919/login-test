@@ -1,13 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>로그인 확인</title>
+  <title>로그인 확인</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      function checkLoginStatus() {
+        $.get("/check_login_status", function(data) {
+          if (data.logged_in === true) {
+            window.location.replace("/");
+          }
+        });
+      }
+      // 5초마다 로그인 상태 확인
+      setInterval(checkLoginStatus, 5000);
+    });
+  </script>
 </head>
 <body>
-    <h1>확인 이메일 전송됨</h1>
-    <p>로그인을 확인하려면 이메일을 확인하세요.</p>
-    <footer>
-        <a href="/">메인 페이지로</a>
-    </footer>
+  <h3>로그인 확인 중...</h3>
+  <footer>
+    <a href="/">메인 페이지로 돌아가기</a>
+  </footer>
 </body>
 </html>

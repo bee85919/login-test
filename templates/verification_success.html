@@ -1,12 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>확인 성공</title>
+  <title>로그인 확인</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      var redirect_url = "{{ redirect_url }}"; // Flask에서 제공하는 리다이렉트 URL
+
+      function checkLoginStatus() {
+        $.get("/check_login_status", function(data) {
+          if (data.logged_in === true) {
+            window.location.replace(redirect_url); // 이메일 페이지로 리다이렉션
+          }
+        });
+      }
+      // 5초마다 로그인 상태 확인
+      setInterval(checkLoginStatus, 5000);
+    });
+  </script>
 </head>
 <body>
-    <h1>{{ message }}</h1>
-    <footer>
-        <a href="/">메인 페이지로</a>
-    </footer>
+  <h3>로그인 확인 중...</h3>
+  <footer>
+    <a href="/">메인 페이지로 돌아가기</a>
+  </footer>
 </body>
 </html>
