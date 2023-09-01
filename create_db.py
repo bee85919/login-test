@@ -1,17 +1,18 @@
+### create_db.py
 import sqlite3
 
 conn = sqlite3.connect('users.db')
 c = conn.cursor()
 
-# Drop table if exists
-c.execute("DROP TABLE IF EXISTS users")
+# 테이블이 존재하면 삭제
+c.execute("DROP TABLE IF EXISTS sessions")
 
-# Create new table
-c.execute('''CREATE TABLE users
+# 새로운 테이블을 생성
+c.execute('''CREATE TABLE sessions
              (id INTEGER PRIMARY KEY AUTOINCREMENT,
               email TEXT NOT NULL UNIQUE,
               token TEXT NOT NULL,
-              verified INTEGER DEFAULT 0);''')
+              created_time DATETIME NOT NULL);''')
 
 conn.commit()
 conn.close()

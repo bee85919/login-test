@@ -5,6 +5,11 @@
 </head>
 <body>
     <h3>메인 페이지에 오신 것을 환영합니다.</h3>
-    <a href="/login">로그인 페이지로</a>
+
+    {% if logged_in %}
+        <h3>{{ email }}님, 환영합니다!</h3>
+    {% else %}
+        <a href="/login">로그인 페이지로</a>
+    {% endif %}
 </body>
 </html>
