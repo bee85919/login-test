@@ -1,18 +1,15 @@
-### session_manager.py
 from datetime import datetime, timedelta
+from dateutil import parser
 import random
 import string
 
-# SessionManager 클래스 정의
 class SessionManager:
-    # 생성자에서 Database 객체를 초기화합니다.
     def __init__(self, db):
         self.db = db
 
-    # 새 세션을 생성하는 메소드입니다.
     def create_session(self, email, session):
         token = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
-        
+
         while self.db.check_duplicate_token(token):
             token = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
 
@@ -20,32 +17,54 @@ class SessionManager:
             self.db.update_session(email, token)
         else:
             self.db.create_session(email, token)
-        
-        session['email'] = email
-        session['token'] = token
-        session['created_time'] = datetime.now()
+
+        session_data = {
+            'email': email,
+            'token': token,
+            'created_time': datetime.now().isoformat()
+        }
+        session['user_data'] = session_data
 
     # 로그인 상태를 확인하는 메소드입니다.
     def is_logged_in(self, session):
-        if 'token' in session:
-            session_data = self.db.get_session(session['token'])
-            if session_data and 'created_time' in session_data:
-                if datetime.now() - datetime.fromisoformat(session_data['created_time']) < timedelta(minutes=1):
-                    return True
-        return False
+        try:
+            session_data = session.get('user_data')
+            
+            if not session_data:
+                return False
+
+            created_time = session_data.get('created_time', None)
+            if not created_time:
+                return False
+
+            # 이미 datetime 객체인 경우 문자열로 변환하지 않음
+            if not isinstance(created_time, str):
+                return True
+
+            created_time = parser.parse(created_time)  # 문자열을 datetime 객체로 변환
+            current_time = datetime.now()
+
+            # 세션 유효 시간 검사 (예: 1시간)
+            if (current_time - created_time).total_seconds() > 60:
+                return False
+
+            return True
+        except Exception as e:
+            print(f"Debug: Error in is_logged_in - {e}")
+            return False
 
     # 토큰을 검증하는 메소드입니다.
     def verify_token(self, token, session):
         session_data = self.db.get_session(token)
         if session_data:
-            if 'token' in session and session_data['token'] == session['token']:
+            stored_token = session.get('user_data', {}).get('token', None)
+            if stored_token == session_data['token']:
                 return True
         return False
     
     # 로그아웃 처리를 하는 메소드입니다.
     def logout(self, session):
-        session.pop('email', None)
-        session.pop('token', None)
-        session.pop('created_time', None)
-        if 'token' in session:
-            self.db.delete_session(session['token'])
+        session_data = session.get('user_data', {})
+        if 'token' in session_data:
+            self.db.delete_session(session_data['token'])
+        session.pop('user_data', None)

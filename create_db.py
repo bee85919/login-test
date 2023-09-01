@@ -1,18 +1,61 @@
-### create_db.py
-import sqlite3
+import os
+import pymysql
+from dotenv import load_dotenv
 
-conn = sqlite3.connect('users.db')
-c = conn.cursor()
+# .env 파일에서 환경 변수를 불러옵니다.
+load_dotenv()
 
-# 테이블이 존재하면 삭제
-c.execute("DROP TABLE IF EXISTS sessions")
+# 환경 변수나 설정 파일로부터 데이터베이스 설정을 가져옵니다.
+db_config = {
+    "host": os.environ.get("DB_HOST", "127.0.0.1"),
+    "port": int(os.environ.get("DB_PORT", 3306)),
+    "user": os.environ.get("DB_USER", "root"),
+    "password": os.environ.get("DB_PASSWORD", ""),
+    "db": os.environ.get("DB_NAME", "your_db_name"),
+    "charset": "utf8"
+}
 
-# 새로운 테이블을 생성
-c.execute('''CREATE TABLE sessions
-             (id INTEGER PRIMARY KEY AUTOINCREMENT,
-              email TEXT NOT NULL UNIQUE,
-              token TEXT NOT NULL,
-              created_time DATETIME NOT NULL);''')
+conn = None
+cursor = None
 
-conn.commit()
-conn.close()
+try:
+    # 데이터베이스 선택을 제외한 연결 설정
+    conn = pymysql.connect(
+        host=db_config['host'],
+        port=db_config['port'],
+        user=db_config['user'],
+        password=db_config['password'],
+        charset=db_config['charset']
+    )
+    cursor = conn.cursor()
+
+    # 'ttc-db' 데이터베이스 생성
+    cursor.execute("CREATE DATABASE IF NOT EXISTS `ttc-db`")
+    conn.commit()
+
+    # 'ttc-db' 데이터베이스 사용 설정
+    conn.select_db('ttc-db')
+
+    # 테이블이 존재하면 삭제
+    cursor.execute("DROP TABLE IF EXISTS sessions")
+
+    # 새로운 테이블을 생성
+    cursor.execute('''
+        CREATE TABLE sessions (
+            id INTEGER PRIMARY KEY AUTO_INCREMENT,
+            email VARCHAR(255) NOT NULL UNIQUE,
+            token VARCHAR(255) NOT NULL,
+            created_time DATETIME NOT NULL
+        );
+    ''')
+
+    conn.commit()
+
+except pymysql.MySQLError as e:
+    print(f"An error occurred: {e}")
+
+finally:
+    if cursor:
+        cursor.close()
+    if conn:
+        conn.close()
