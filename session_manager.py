@@ -1,3 +1,4 @@
+### session_manager.py
 from datetime import datetime, timedelta
 from dateutil import parser
 import random
@@ -18,6 +19,7 @@ class SessionManager:
         else:
             self.db.create_session(email, token)
 
+        # 세션 데이터 생성
         session_data = {
             'email': email,
             'token': token,
@@ -38,19 +40,16 @@ class SessionManager:
                 return False
 
             # 이미 datetime 객체인 경우 문자열로 변환하지 않음
-            if not isinstance(created_time, str):
+            if isinstance(created_time, datetime):
+                current_time = datetime.now()
+
+                # 세션 유효 시간 검사
+                if (current_time - created_time).total_seconds() > 60:
+                    return False
+
                 return True
-
-            created_time = parser.parse(created_time)  # 문자열을 datetime 객체로 변환
-            current_time = datetime.now()
-
-            # 세션 유효 시간 검사 (예: 1시간)
-            if (current_time - created_time).total_seconds() > 60:
-                return False
-
-            return True
         except Exception as e:
-            print(f"Debug: Error in is_logged_in - {e}")
+            print(f"Debug: is_logged_in 메소드에서 에러 발생 - {e}")
             return False
 
     # 토큰을 검증하는 메소드입니다.

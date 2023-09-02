@@ -1,3 +1,4 @@
+### app.py
 from flask import Flask, session, request, render_template, redirect, url_for
 import os
 from dotenv import load_dotenv
@@ -46,8 +47,9 @@ session_manager = SessionManager(db_instance)
 @app.route('/')
 def index():
     is_logged_in = session_manager.is_logged_in(session)
+    user_data = session.get('user_data', {})
     if is_logged_in:
-        return render_template('index.html', logged_in=True, email=session['email'])
+        return render_template('index.html', logged_in=True, email=user_data.get('email'))
     return render_template('index.html', logged_in=False)
 
 # 로그인 상태 확인 라우트
@@ -60,7 +62,7 @@ def check_login_status():
             return "Not logged in"
     except Exception as e:
         # 에러 발생 시 디버깅
-        print(f"Debug: Error in check_login_status - {e}")
+        print(f"Debug: check_login_status에서 에러 발생 - {e}")
         return "Error"
 
 # 로그인 페이지 라우트
@@ -71,7 +73,6 @@ def login():
         
         if not session_manager.is_logged_in(session):
             session_manager.create_session(email, session)
-            email_service.send_email(email, session['token'])
             return redirect(url_for('login_verification'))
         else:
             return redirect(url_for('index'))
@@ -80,7 +81,8 @@ def login():
 # 이메일 인증 페이지 라우트
 @app.route('/login_verification')
 def login_verification():
-    email = session.get('email', 'unknown@example.com')
+    user_data = session.get('user_data', {})
+    email = user_data.get('email', 'unknown@example.com')
     domain = email.split('@')[1] if '@' in email else 'example.com'
     return render_template('login_verification.html', email_domain=domain)
 
