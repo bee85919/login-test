@@ -3,8 +3,10 @@ import os
 import pymysql
 from dotenv import load_dotenv
 
+
 # .env 파일에서 환경 변수를 불러옵니다.
 load_dotenv()
+
 
 # 환경 변수나 설정 파일로부터 데이터베이스 설정을 가져옵니다.
 db_config = {
@@ -16,8 +18,10 @@ db_config = {
     "charset": "utf8"
 }
 
+
 conn = None
 cursor = None
+
 
 try:
     # 데이터베이스 선택을 제외한 연결 설정
@@ -30,30 +34,35 @@ try:
     )
     cursor = conn.cursor()
 
-    # 'ttc-db' 데이터베이스 생성
-    cursor.execute("CREATE DATABASE IF NOT EXISTS `ttc-db`")
+
+    # 'TEST' 데이터베이스 생성
+    cursor.execute("CREATE DATABASE IF NOT EXISTS `Basic_info`")
     conn.commit()
 
-    # 'ttc-db' 데이터베이스 사용 설정
-    conn.select_db('ttc-db')
+
+    # 'TEST' 데이터베이스 사용 설정
+    conn.select_db('Basic_info')
+
 
     # 테이블이 존재하면 삭제
-    cursor.execute("DROP TABLE IF EXISTS sessions")
+    cursor.execute("DROP TABLE IF EXISTS TEST")
+
 
     # 새로운 테이블을 생성
     cursor.execute('''
-        CREATE TABLE sessions (
-            id INTEGER PRIMARY KEY AUTO_INCREMENT,
-            email VARCHAR(255) NOT NULL UNIQUE,
-            token VARCHAR(255) NOT NULL,
-            created_time DATETIME NOT NULL
+        CREATE TABLE TEST (
+            ID INTEGER PRIMARY KEY AUTO_INCREMENT,
+            USER_EMAIL VARCHAR(255) NOT NULL UNIQUE,
+            TOKEN_CD VARCHAR(255) NOT NULL,
+            CREATE_DATE DATETIME NOT NULL
         );
     ''')
-
     conn.commit()
+
 
 except pymysql.MySQLError as e:
     print(f"An error occurred: {e}")
+
 
 finally:
     if cursor:

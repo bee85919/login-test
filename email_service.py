@@ -12,6 +12,7 @@ class EmailService:
         self.email = os.environ.get("EMAIL")
         self.password = os.environ.get("PASSWORD")
 
+
     def send_email(self, to_email, token):
         try:
             smtp = smtplib.SMTP_SSL('smtp.gmail.com', 465)

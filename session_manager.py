@@ -8,6 +8,7 @@ class SessionManager:
     def __init__(self, db):
         self.db = db
 
+
     def create_session(self, email, session):
         token = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
 
@@ -26,6 +27,7 @@ class SessionManager:
             'created_time': datetime.now().isoformat()
         }
         session['user_data'] = session_data
+
 
     # 로그인 상태를 확인하는 메소드입니다.
     def is_logged_in(self, session):
@@ -52,6 +54,7 @@ class SessionManager:
             print(f"Debug: is_logged_in 메소드에서 에러 발생 - {e}")
             return False
 
+
     # 토큰을 검증하는 메소드입니다.
     def verify_token(self, token, session):
         session_data = self.db.get_session(token)
@@ -60,6 +63,7 @@ class SessionManager:
             if stored_token == session_data['token']:
                 return True
         return False
+    
     
     # 로그아웃 처리를 하는 메소드입니다.
     def logout(self, session):
