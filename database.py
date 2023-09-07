@@ -31,21 +31,21 @@ class Database:
 
 
     # 세션을 업데이트하는 메소드입니다.
-    def update_session(self, email, new_token):
+    def update_session(self, USER_EMAIL, TOKEN_CD):
         conn = self.connect()
         c = conn.cursor()
-        current_time = datetime.now()
-        c.execute("UPDATE TEST SET TOKEN_CD = %s, CREATE_TIME = %s WHERE USER_EMAIL = %s", (new_token, current_time, email))
+        CREATE_DATE = datetime.now()
+        c.execute("UPDATE TEST SET TOKEN_CD = %s, CREATE_DATE = %s WHERE USER_EMAIL = %s", (TOKEN_CD, CREATE_DATE, USER_EMAIL))
         conn.commit()
         conn.close()
 
 
     # 새 세션을 생성하는 메소드입니다.
-    def create_session(self, email, token):
+    def create_session(self, USER_EMAIL, TOKEN_CD):
         conn = self.connect()
-        CREATE_TIME = datetime.now()
+        CREATE_DATE = datetime.now()
         c = conn.cursor()
-        c.execute("INSERT INTO TEST (USER_EMAIL, TOKEN_CD, CREATE_TIME) VALUES (%s, %s, %s)", (email, token, created_time))
+        c.execute("INSERT INTO TEST (USER_EMAIL, TOKEN_CD, CREATE_DATE) VALUES (%s, %s, %s)", (USER_EMAIL, TOKEN_CD, CREATE_DATE))
         conn.commit()
         conn.close()
 

@@ -11,6 +11,8 @@ class EmailService:
     def __init__(self):
         self.email = os.environ.get("EMAIL")
         self.password = os.environ.get("PASSWORD")
+        if not self.email or not self.password:
+            raise ValueError("EMAIL and PASSWORD must be set in environment variables.")
 
 
     def send_email(self, to_email, token):
@@ -26,6 +28,7 @@ class EmailService:
             msg.attach(content_part)
             smtp.sendmail(self.email, to_email, msg.as_string())
             smtp.quit()
+            print('이메일 전송')
         except Exception as e:
             print(f"이메일 전송 실패: {e}")
             raise e

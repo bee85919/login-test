@@ -55,7 +55,7 @@ def index():
     is_logged_in = session_manager.is_logged_in(session)
     user_data = session.get('user_data', {})
     if is_logged_in:
-        return render_template('index.html', logged_in=True, email=user_data.get('email'))
+        return render_template('index.html', logged_in=True, email=user_data.get('USER_EMAIL'))
     return render_template('index.html', logged_in=False)
 
 
@@ -77,10 +77,10 @@ def check_login_status():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form['email']
-        
+        email = request.form['email']        
         if not session_manager.is_logged_in(session):
-            session_manager.create_session(email, session)
+            session_manager.create_session(email, session)            
+            email_service.send_email(email, session['user_data']['TOKEN_CD'])
             return redirect(url_for('login_verification'))
         else:
             return redirect(url_for('index'))
@@ -91,7 +91,7 @@ def login():
 @app.route('/login_verification')
 def login_verification():
     user_data = session.get('user_data', {})
-    email = user_data.get('email', 'unknown@example.com')
+    email = user_data.get('USER_EMAIL', 'unknown@example.com')
     domain = email.split('@')[1] if '@' in email else 'example.com'
     return render_template('login_verification.html', email_domain=domain)
 
