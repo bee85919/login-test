@@ -1,4 +1,3 @@
-### email_service.py
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -7,7 +6,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-class EmailService:
+
+class EmailSender:
     def __init__(self):
         self.email = os.environ.get("EMAIL")
         self.password = os.environ.get("PASSWORD")
@@ -28,7 +28,7 @@ class EmailService:
             msg.attach(content_part)
             smtp.sendmail(self.email, to_email, msg.as_string())
             smtp.quit()
-            print('이메일 전송')
+            print('Debug: 이메일 전송 완료')  # 디버깅 로그
         except Exception as e:
-            print(f"이메일 전송 실패: {e}")
+            print(f"Debug: 이메일 전송 실패, 에러: {e}")  # 디버깅 로그
             raise e
